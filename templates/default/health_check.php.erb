@@ -1,0 +1,27 @@
+<?php
+// Simple health check
+
+$message = '';
+
+$link = mysql_connect('<%= node[:wordpress][:db][:host] %>',
+                      '<%= node[:wordpress][:db][:user] %>',
+                      '<%= node[:wordpress][:db][:pass] %>');
+
+if ( ! $link ) {
+  $message = mysql_error();
+} else {
+  $db = mysql_select_db('<%= node[:wordpress][:db][:name] %>', $link);
+  if(!$db) {
+    $message = 'Could not select database.';
+  }
+}
+
+mysql_close($link);
+
+if($message != '') {
+  header('HTTP/ 500 ' . $message);
+} else {
+  header('HTTP/ 200 Seems healthy');
+}
+
+?>

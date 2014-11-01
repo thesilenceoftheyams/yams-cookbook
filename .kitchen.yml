@@ -5,12 +5,16 @@ driver:
 provisioner:
   name: chef_solo
 
+driver_config:
+  require_chef_omnibus: true
+
 platforms:
-  - name: ubuntu-12.04
-  - name: centos-6.4
+  - name: ubuntu-14.04
 
 suites:
-  - name: default
+  - name: db
     run_list:
-      - recipe[wfpblife::default]
-    attributes:
+      - recipe[wfpblife2::db]
+  - name: app
+    run_list:
+      - recipe[wfpblife2::app]

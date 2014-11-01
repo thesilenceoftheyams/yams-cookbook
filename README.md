@@ -1,10 +1,6 @@
 # wfpblife-cookbook
 
-TODO: Enter the cookbook description here.
-
-## Supported Platforms
-
-TODO: List your supported platforms.
+TODO: wfpblife.com
 
 ## Attributes
 
@@ -25,17 +21,32 @@ TODO: List your supported platforms.
 
 ## Usage
 
-### wfpblife::default
+### wfpblife::db
 
-Include `wfpblife` in your node's `run_list`:
+Include `wfpblife::db` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[wfpblife::default]"
+    "recipe[wfpblife::db]"
   ]
 }
 ```
+
+### wfpblife::app
+
+The application server recipe requires exactly one database node.
+
+Include `wfpblife::app` in your node's `run_list`:
+
+```json
+{
+  "run_list": [
+    "recipe[wfpblife::app]"
+  ]
+}
+```
+
 
 ## License and Authors
 
