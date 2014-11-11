@@ -37,6 +37,7 @@ fail "Required data bag wp::setup is not configured correctly. #{bag[:setup].to_
          bag[:setup]['admin_email']
 
 fail "Required data bag wp::w3tc is not configured correctly. #{bag[:w3tc].to_json}" unless bag[:w3tc]
+fail "Required data bag wp::db is not configured correctly. #{bag[:db].to_json}" unless bag[:db]
 
 node.override[:wordpress][:db][:pass] = bag[:db]['password']
 node.default[:wordpress][:db][:host] = dbs.first['fqdn']
