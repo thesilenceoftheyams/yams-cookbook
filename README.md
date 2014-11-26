@@ -1,7 +1,7 @@
-wfpblife-cookbook
-=================
+yams-cookbook
+=============
 
-TODO: wfpblife.com
+TODO: www.thesilenceoftheyams.com
 
 Attributes
 ----------
@@ -14,7 +14,7 @@ Attributes
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['wfpblife']['bacon']</tt></td>
+    <td><tt>['yams']['bacon']</tt></td>
     <td>Boolean</td>
     <td>whether to include bacon</td>
     <td><tt>true</tt></td>
@@ -24,28 +24,28 @@ Attributes
 Usage
 -----
 
-### wfpblife::db
+### yams::db
 
-Include `wfpblife::db` in your node's `run_list`:
+Include `yams::db` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[wfpblife::db]"
+    "recipe[yams::db]"
   ]
 }
 ```
 
-### wfpblife::app
+### yams::app
 
 The application server recipe requires exactly one database node, or the recipe will fail with an error.
 
-Include `wfpblife::app` in your node's `run_list`:
+Include `yams::app` in your node's `run_list`:
 
 ```json
 {
   "run_list": [
-    "recipe[wfpblife::app]"
+    "recipe[yams::app]"
   ]
 }
 ```

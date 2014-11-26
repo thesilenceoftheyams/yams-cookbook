@@ -1,9 +1,9 @@
-name             'wfpblife'
+name             'yams'
 maintainer       'Kevin J. Dickerson'
 maintainer_email 'kevin.dickerson@loom.technology'
 license          'Apache 2.0'
-description      'Installs/Configures wfpblife'
-long_description 'Installs/Configures wfpblife'
+description      'Installs/Configures yams'
+long_description 'Installs/Configures yams for www.thesilenceoftheyams.com'
 version          '0.1.1'
 
 depends 'python'

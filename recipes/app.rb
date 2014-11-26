@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: wfpblife
+# Cookbook Name:: yams
 # Recipe:: app
 #
 # Copyright (C) 2014 Kevin J. Dickerson
@@ -17,9 +17,7 @@
 # limitations under the License.
 #
 
-# gem_package 'chef-vault'
-
-dbs = search(:node, 'roles:wfpblife-db')
+dbs = search(:node, 'roles:yams-db')
 
 fail 'Could not find a database server in the node list.' unless dbs && dbs.first['fqdn']
 fail "There should be exactly 1 database node, but there are #{dbs.count}." unless dbs.count == 1
@@ -34,7 +32,6 @@ node.override[:wordpress][:db][:pass] = bag[:mysql]['db_password']
 node.default[:wordpress][:db][:host] = dbs.first['fqdn']
 node.default[:wordpress][:db][:user] = bag[:mysql]['db_user']
 node.default[:wordpress][:db][:name] = bag[:mysql]['db_name']
-# node.default[:wordpress][:db][:pass] = bag[:mysql]['db_password']
 node.default[:aws][:cloudfront_key] = bag[:aws]['cloudfront_key']
 node.default[:aws][:cloudfront_secret] = bag[:aws]['cloudfront_secret']
 node.default[:aws][:s3_bucket] = bag[:aws]['s3_bucket']
@@ -92,7 +89,7 @@ execute 'delete akismet plugin' do
   user node[:apache][:user]
   action :run
 end
-#
+
 execute 'install the aws-for-wp plugin' do
   command 'wp plugin install aws-for-wp'
   cwd node[:wordpress][:dir]
@@ -107,7 +104,6 @@ execute 'activate the aws-for-wp plugin' do
   action :run
 end
 
-
 execute 'install the w3-total-cache plugin' do
   command 'wp plugin install w3-total-cache'
   cwd node[:wordpress][:dir]
@@ -121,7 +117,6 @@ execute 'activate the w3-total-cache plugin' do
   user node[:apache][:user]
   action :run
 end
-
 
 directory "#{node[:wordpress][:dir]}/wp-content/w3tc-config" do
   owner node['apache']['user']
@@ -143,19 +138,6 @@ template "#{node[:wordpress][:dir]}/wp-content/w3tc-config/master-admin.php" do
   mode '0644'
 end
 
-# directory "#{node[:wordpress][:dir]}/wp-content/plugins/aws-for-wp/amazon-s3-and-cloudfront/wordpress-s3" do
-#   owner node['apache']['user']
-#   group node['apache']['user']
-#   recursive true
-# end
-#
-# template "#{node[:wordpress][:dir]}/wp-content/plugins/aws-for-wp/amazon-s3-and-cloudfront/wordpress-s3/config.php" do
-#   owner node['apache']['user']
-#   group node['apache']['user']
-#   source 'aws_for_wp_config.php.erb'
-#   mode '0644'
-# end
-
 file "#{node[:wordpress][:dir]}/wp-content/w3tc-config/index.html" do
   owner node['apache']['user']
   group node['apache']['user']
@@ -167,12 +149,9 @@ node.override['newrelic']['license_key'] = bag[:newrelic]['key']
 node.override['newrelic']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['application_monitoring']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['server_monitoring']['license'] = bag[:newrelic]['key']
-
-# node.default['newrelic']['application_monitoring']['enabled'] = true
-# node.default['newrelic']['application_monitoring']['app_name'] = 'test wfpblife app on app server'
-
+node.default['newrelic']['application_monitoring']['enabled'] = true
+node.default['newrelic']['application_monitoring']['app_name'] = "#{default[:blog][:human_name]} App"
 node.override['newrelic']['php_agent']['license'] = bag[:newrelic]['key']
-# node.override['newrelic']['php_agent']['config_file'] = '/etc/php5/mods-available/newrelic.ini'
 
 include_recipe 'java'
 include_recipe 'python'

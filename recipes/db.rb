@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: wfpblife
+# Cookbook Name:: yams
 # Recipe:: db
 #
 # Copyright (C) 2014 Kevin J. Dickerson
@@ -22,7 +22,7 @@ bag[:mysql] = data_bag_item('configurations', 'mysql')
 bag[:mysql_aws_backup] = data_bag_item('configurations', 'mysql_aws_backup')
 
 node.override['mysql']['server_root_password'] = bag[:mysql]['root_password']
-node.override['mysql']['service_name'] = 'wfpblife_mysql'
+node.override['mysql']['service_name'] = 'yams_mysql'
 
 include_recipe 'apt'
 include_recipe 'mysql::server'
@@ -52,12 +52,12 @@ mysql_database 'flush the privileges' do
   action :query
 end
 
-template '/etc/mysql/conf.d/wfpblife.cnf' do
-  source 'wfpblife.cnf.erb'
+template '/etc/mysql/conf.d/yams.cnf' do
+  source 'yams.cnf.erb'
   mode '0644'
   owner 'mysql'
   group 'mysql'
-  notifies :restart, 'mysql_service[wfpblife_mysql]'
+  notifies :restart, 'mysql_service[yams_mysql]'
 end
 
 gem_package 'aws-sdk' do
@@ -88,15 +88,15 @@ file "/var/log/mysql-aws-backup/log.txt" do
   action :create
 end
 
-mysql_aws_backup_env = { MYSQL_AWS_BACKUP_HOST:'127.0.0.1',
-                         MYSQL_AWS_BACKUP_MYSQL_USER:'root',
-                         MYSQL_AWS_BACKUP_MYSQL_PASSWORD:node['mysql']['server_root_password'],
-                         MYSQL_AWS_BACKUP_FILE_PREFIX:'wfpblife-backup',
-                         MYSQL_AWS_BACKUP_BUCKET:'wfpblife-db-backups',
-                         MYSQL_AWS_BACKUP_DATABASE:bag[:mysql]['db_name'],
-                         MYSQL_AWS_BACKUP_AWS_ACCESS_KEY_ID:bag[:mysql_aws_backup]['aws_id'],
-                         MYSQL_AWS_BACKUP_AWS_SECRET_ACCESS_KEY:bag[:mysql_aws_backup]['aws_secret'],
-                         MYSQL_AWS_BACKUP_AWS_REGION:bag[:mysql_aws_backup]['aws_region'] }
+mysql_aws_backup_env = { MYSQL_AWS_BACKUP_HOST: '127.0.0.1',
+                         MYSQL_AWS_BACKUP_MYSQL_USER: 'root',
+                         MYSQL_AWS_BACKUP_MYSQL_PASSWORD: node['mysql']['server_root_password'],
+                         MYSQL_AWS_BACKUP_FILE_PREFIX: node['yams']['backup_file_prefix'],
+                         MYSQL_AWS_BACKUP_BUCKET: node['yams']['backup_bucket'],
+                         MYSQL_AWS_BACKUP_DATABASE: bag[:mysql]['db_name'],
+                         MYSQL_AWS_BACKUP_AWS_ACCESS_KEY_ID: bag[:mysql_aws_backup]['aws_id'],
+                         MYSQL_AWS_BACKUP_AWS_SECRET_ACCESS_KEY: bag[:mysql_aws_backup]['aws_secret'],
+                         MYSQL_AWS_BACKUP_AWS_REGION: bag[:mysql_aws_backup]['aws_region'] }
 
 cron 'mysql_aws_backup' do
   action :create
@@ -116,10 +116,9 @@ node.override['newrelic']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['application_monitoring']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['server_monitoring']['license'] = bag[:newrelic]['key']
 
-node.default['newrelic']['application_monitoring']['enabled'] = true
-node.default['newrelic']['application_monitoring']['app_name'] = 'Wfpblife Blog'
+node.default['newrelic']['application_monitoring']['enabled'] = false
 
-node.default[:newrelic][:mysql][:servers] = [ { "name"          => "WFPBLife Blog 1",
+node.default[:newrelic][:mysql][:servers] = [ { "name"          => "#{default[:yams][:human_name]}",
                                                 "host"          => "127.0.0.1",
                                                 "metrics"       => "status,newrelic,master",
                                                 "mysql_user"    => "root",
