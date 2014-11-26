@@ -18,35 +18,34 @@
 #
 
 bag = {}
-bag[:db] = data_bag_item('wp', 'db')
-bag[:mysql_aws_backup] = data_bag_item('mysql_aws_backup', 'aws_credentials')
+bag[:mysql] = data_bag_item('configurations', 'mysql')
+bag[:mysql_aws_backup] = data_bag_item('configurations', 'mysql_aws_backup')
 
-node.override['mysql']['server_root_password'] = bag[:db]['root_password']
+node.override['mysql']['server_root_password'] = bag[:mysql]['root_password']
 node.override['mysql']['service_name'] = 'wfpblife_mysql'
 
 include_recipe 'apt'
 include_recipe 'mysql::server'
 include_recipe 'database::mysql'
 
-db_credentials = { host: '127.0.0.1', port: 3306, username: 'root',
+db_credentials = { host: '127.0.0.1',
+                   port: 3306,
+                   username: 'root',
                    password: node['mysql']['server_root_password'] }
 
-# Create a mysql database
-mysql_database bag[:db]['name'] do
+mysql_database bag[:mysql]['db_name'] do
   connection db_credentials
   action :create
 end
 
-# grant all privileges on all databases/tables from any address
-mysql_database_user bag[:db]['user'] do
+mysql_database_user bag[:mysql]['db_user'] do
   connection db_credentials
-  password bag[:db]['password']
-  database_name bag[:db]['name']
+  password bag[:mysql]['db_password']
+  database_name bag[:mysql]['db_name']
   host '%'
   action :grant
 end
 
-# Query a database
 mysql_database 'flush the privileges' do
   connection db_credentials
   sql 'flush privileges'
@@ -66,13 +65,7 @@ gem_package 'aws-sdk' do
   action :install
 end
 
-gem_package 'resque' do
-  action :install
-end
-
-gem_package 'mysql-aws-backup' do
-  action :install
-end
+gem_package 'mysql-aws-backup'
 
 directory "/var/log/mysql-aws-backup" do
   owner 'root'
@@ -100,7 +93,7 @@ mysql_aws_backup_env = { MYSQL_AWS_BACKUP_HOST:'127.0.0.1',
                          MYSQL_AWS_BACKUP_MYSQL_PASSWORD:node['mysql']['server_root_password'],
                          MYSQL_AWS_BACKUP_FILE_PREFIX:'wfpblife-backup',
                          MYSQL_AWS_BACKUP_BUCKET:'wfpblife-db-backups',
-                         MYSQL_AWS_BACKUP_DATABASE:bag[:db]['name'],
+                         MYSQL_AWS_BACKUP_DATABASE:bag[:mysql]['db_name'],
                          MYSQL_AWS_BACKUP_AWS_ACCESS_KEY_ID:bag[:mysql_aws_backup]['aws_id'],
                          MYSQL_AWS_BACKUP_AWS_SECRET_ACCESS_KEY:bag[:mysql_aws_backup]['aws_secret'],
                          MYSQL_AWS_BACKUP_AWS_REGION:bag[:mysql_aws_backup]['aws_region'] }
@@ -115,3 +108,26 @@ cron 'mysql_aws_backup' do
   environment mysql_aws_backup_env
   command '/opt/chef/embedded/bin/mysql-aws-backup 2>&1 | tee --append /var/log/mysql-aws-backup/log.txt'
 end
+
+bag[:newrelic] = data_bag_item('configurations', 'newrelic')
+
+node.override['newrelic']['license_key'] = bag[:newrelic]['key']
+node.override['newrelic']['license'] = bag[:newrelic]['key']
+node.override['newrelic']['application_monitoring']['license'] = bag[:newrelic]['key']
+node.override['newrelic']['server_monitoring']['license'] = bag[:newrelic]['key']
+
+node.default['newrelic']['application_monitoring']['enabled'] = true
+node.default['newrelic']['application_monitoring']['app_name'] = 'Wfpblife Blog'
+
+node.default[:newrelic][:mysql][:servers] = [ { "name"          => "WFPBLife Blog 1",
+                                                "host"          => "127.0.0.1",
+                                                "metrics"       => "status,newrelic,master",
+                                                "mysql_user"    => "root",
+                                                "mysql_passwd"  => bag[:mysql]['root_password']
+                                              }
+                                            ]
+
+include_recipe 'java'
+include_recipe 'python'
+include_recipe 'newrelic'
+include_recipe 'newrelic_plugins::mysql'
