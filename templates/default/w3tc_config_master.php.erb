@@ -309,10 +309,10 @@ return array(
 	'cdn.cf2.secret' => '<%= node[:aws][:cloudfront_secret] %>',
 	'cdn.cf2.id' => '<%= node[:aws][:cloudfront_subdomain] %>',
 	'cdn.cf2.cname' => array(
-	0 => 'cdn1.wfpblife.com',
-	1 => 'cdn2.wfpblife.com',
-	2 => 'cdn3.wfpblife.com',
-	3 => 'cdn4.wfpblife.com',
+	0 => 'cdn1.thesilenceoftheyams.com',
+	1 => 'cdn2.thesilenceoftheyams.com',
+	2 => 'cdn3.thesilenceoftheyams.com',
+	3 => 'cdn4.thesilenceoftheyams.com',
 	),
 	'cdn.cf2.ssl' => 'auto',
 	'cdn.rscf.user' => '',
@@ -664,7 +664,7 @@ return array(
 	'newrelic.api_key' => '<%= node[:newrelic][:api_key] %>',
 	'newrelic.account_id' => '246147',
 	'newrelic.application_id' => 4664958,
-	'newrelic.appname' => 'wfpblife blog',
+	'newrelic.appname' => '<%= node[:yams][:human_name] %>',
 	'newrelic.accept.logged_roles' => true,
 	'newrelic.accept.roles' => array(
 	0 => 'contributor',
@@ -713,6 +713,6 @@ return array(
 	),
 	'plugin.license_key' => '',
 	'plugin.type' => '',
-	'wordpress.home' => 'http://www.wfpblife.com',
+	'wordpress.home' => 'http://www.thesilenceoftheyams.com',
 	'pgcache.bad_behavior_path' => '',
 );

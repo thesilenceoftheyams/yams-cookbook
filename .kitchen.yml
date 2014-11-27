@@ -14,7 +14,7 @@ platforms:
 suites:
   - name: db
     run_list:
-      - recipe[wfpblife2::db]
+      - recipe[yams::db]
   - name: app
     run_list:
-      - recipe[wfpblife2::app]
+      - recipe[yams::app]
