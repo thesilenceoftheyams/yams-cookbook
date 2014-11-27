@@ -1,8 +1,10 @@
-# wfpblife-cookbook
+wfpblife-cookbook
+=================
 
 TODO: wfpblife.com
 
-## Attributes
+Attributes
+----------
 
 <table>
   <tr>
@@ -19,7 +21,8 @@ TODO: wfpblife.com
   </tr>
 </table>
 
-## Usage
+Usage
+-----
 
 ### wfpblife::db
 
@@ -35,7 +38,7 @@ Include `wfpblife::db` in your node's `run_list`:
 
 ### wfpblife::app
 
-The application server recipe requires exactly one database node.
+The application server recipe requires exactly one database node, or the recipe will fail with an error.
 
 Include `wfpblife::app` in your node's `run_list`:
 
@@ -47,7 +50,15 @@ Include `wfpblife::app` in your node's `run_list`:
 }
 ```
 
+License and Authors
+-------------------
 
-## License and Authors
+Author:: Kevin J. Dickerson (kevin.dickerson@loom.technology)
 
-Author:: Kevin J. Dickerson (<kevin.dickerson@loom.technology>)
+TODO
+----
+
+-	Automate theme.
+-	Add tests.
+-	Encrypt data bags.
+-	Define, and then refactor attributes and data bag structure.
