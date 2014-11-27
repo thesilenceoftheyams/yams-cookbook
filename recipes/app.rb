@@ -150,7 +150,7 @@ node.override['newrelic']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['application_monitoring']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['server_monitoring']['license'] = bag[:newrelic]['key']
 node.default['newrelic']['application_monitoring']['enabled'] = true
-node.default['newrelic']['application_monitoring']['app_name'] = "#{default[:blog][:human_name]} App"
+node.default['newrelic']['application_monitoring']['app_name'] = "#{node.default[:blog][:human_name]} App"
 node.override['newrelic']['php_agent']['license'] = bag[:newrelic]['key']
 
 include_recipe 'java'
