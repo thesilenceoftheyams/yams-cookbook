@@ -17,9 +17,13 @@
 # limitations under the License.
 #
 
-dbs = search(:node, 'roles:yams-db')
+if Chef::Config[:solo]
+  Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
+else
+  dbs = search(:node, 'roles:yams-db')
+end
 
-fail 'Could not find a database server in the node list.' unless dbs && dbs.first['fqdn']
+fail 'Could not find a database server in the node list.' unless defined? dbs && dbs && dbs.first['fqdn']
 fail "There should be exactly 1 database node, but there are #{dbs.count}." unless dbs.count == 1
 
 bag = {}
@@ -28,17 +32,17 @@ bag[:wp] = data_bag_item('configurations', 'wp')
 bag[:aws] = data_bag_item('configurations', 'aws')
 bag[:newrelic] = data_bag_item('configurations', 'newrelic')
 
-node.override[:wordpress][:db][:pass] = bag[:mysql]['db_password']
-node.default[:wordpress][:db][:host] = dbs.first['fqdn']
-node.default[:wordpress][:db][:user] = bag[:mysql]['db_user']
-node.default[:wordpress][:db][:name] = bag[:mysql]['db_name']
-node.default[:aws][:cloudfront_key] = bag[:aws]['cloudfront_key']
-node.default[:aws][:cloudfront_secret] = bag[:aws]['cloudfront_secret']
-node.default[:aws][:s3_bucket] = bag[:aws]['s3_bucket']
-node.default[:aws][:cloudfront_domain] = 'dtilrwd2esdkz.cloudfront.net'
-node.default[:newrelic][:api_key] = bag[:newrelic]['api_key']
-node.default[:aws][:cloudfront_subdomain] = bag[:aws]['cloudfront_subdomain']
-node.override[:aws][:cloudfront_full_domain] = bag[:aws]['cloudfront_full_domain']
+node.override['wordpress']['db']['pass'] = bag[:mysql]['db_password']
+node.default['wordpress']['db']['host'] = dbs.first['fqdn']
+node.default['wordpress']['db']['user'] = bag[:mysql]['db_user']
+node.default['wordpress']['db']['name'] = bag[:mysql]['db_name']
+node.default['aws']['cloudfront_key'] = bag[:aws]['cloudfront_key']
+node.default['aws']['cloudfront_secret'] = bag[:aws]['cloudfront_secret']
+node.default['aws']['s3_bucket'] = bag[:aws]['s3_bucket']
+node.default['aws']['cloudfront_domain'] = 'dtilrwd2esdkz.cloudfront.net'
+node.default['newrelic']['api_key'] = bag[:newrelic]['api_key']
+node.default['aws']['cloudfront_subdomain'] = bag[:aws]['cloudfront_subdomain']
+node.override['aws']['cloudfront_full_domain'] = bag[:aws]['cloudfront_full_domain']
 
 include_recipe 'apt'
 include_recipe 'varnish'
@@ -58,18 +62,18 @@ execute 'ensure core wordpress is initialized' do
   command <<-CMD
     wp core install --url="#{bag[:wp]['domain']}" --title="#{bag[:wp]['title']}" --admin_user="#{bag[:wp]['admin_user']}" --admin_password="#{bag[:wp]['admin_password']}" --admin_email="#{bag[:wp]['admin_email']}"
   CMD
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
-directory "#{node[:wordpress][:dir]}/health_check" do
+directory "#{node['wordpress']['dir']}/health_check" do
   owner node['apache']['user']
   group node['apache']['user']
   recursive true
 end
 
-template "#{node[:wordpress][:dir]}/health_check/index.php" do
+template "#{node['wordpress']['dir']}/health_check/index.php" do
   owner node['apache']['user']
   group node['apache']['user']
   source 'health_check.php.erb'
@@ -78,67 +82,67 @@ end
 
 execute 'delete hello plugin' do
   command 'wp plugin delete hello'
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
 execute 'delete akismet plugin' do
   command 'wp plugin delete akismet'
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
 execute 'install the aws-for-wp plugin' do
   command 'wp plugin install aws-for-wp'
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
 execute 'activate the aws-for-wp plugin' do
   command 'wp plugin activate aws-for-wp'
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
 execute 'install the w3-total-cache plugin' do
   command 'wp plugin install w3-total-cache'
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
 execute 'activate the w3-total-cache plugin' do
   command 'wp plugin activate w3-total-cache'
-  cwd node[:wordpress][:dir]
-  user node[:apache][:user]
+  cwd node['wordpress']['dir']
+  user node['apache']['user']
   action :run
 end
 
-directory "#{node[:wordpress][:dir]}/wp-content/w3tc-config" do
+directory "#{node['wordpress']['dir']}/wp-content/w3tc-config" do
   owner node['apache']['user']
   group node['apache']['user']
   recursive true
 end
 
-template "#{node[:wordpress][:dir]}/wp-content/w3tc-config/master.php" do
+template "#{node['wordpress']['dir']}/wp-content/w3tc-config/master.php" do
   owner node['apache']['user']
   group node['apache']['user']
   source 'w3tc_config_master.php.erb'
   mode '0644'
 end
 
-template "#{node[:wordpress][:dir]}/wp-content/w3tc-config/master-admin.php" do
+template "#{node['wordpress']['dir']}/wp-content/w3tc-config/master-admin.php" do
   owner node['apache']['user']
   group node['apache']['user']
   source 'w3tc_config_master_admin.php.erb'
   mode '0644'
 end
 
-file "#{node[:wordpress][:dir]}/wp-content/w3tc-config/index.html" do
+file "#{node['wordpress']['dir']}/wp-content/w3tc-config/index.html" do
   owner node['apache']['user']
   group node['apache']['user']
   mode '0644'
@@ -150,7 +154,7 @@ node.override['newrelic']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['application_monitoring']['license'] = bag[:newrelic]['key']
 node.override['newrelic']['server_monitoring']['license'] = bag[:newrelic]['key']
 node.default['newrelic']['application_monitoring']['enabled'] = true
-node.default['newrelic']['application_monitoring']['app_name'] = "#{node.default[:blog][:human_name]} App"
+node.default['newrelic']['application_monitoring']['app_name'] = "#{node.default['yams']['human_name']} App"
 node.override['newrelic']['php_agent']['license'] = bag[:newrelic]['key']
 
 include_recipe 'java'
@@ -162,7 +166,7 @@ file '/etc/php5/apache2/conf.d/newrelic.ini' do
   action :delete
 end
 
-tantan_wordpress_s3_json = "a:5:{s:3:\"key\";s:20:\"#{node[:aws][:cloudfront_key]}\";s:6:\"secret\";s:40:\"#{node[:aws][:cloudfront_secret]}\";s:6:\"bucket\";s:18:\"#{node[:aws][:s3_bucket]}\";s:10:\"cloudfront\";s:28:\"#{node[:aws][:cloudfront_full_domain]}\";s:10:\"wp-uploads\";s:1:\"1\";}"
+tantan_wordpress_s3_json = "a:5:{s:3:\"key\";s:20:\"#{node['aws']['cloudfront_key']}\";s:6:\"secret\";s:40:\"#{node['aws']['cloudfront_secret']}\";s:6:\"bucket\";s:18:\"#{node['aws']['s3_bucket']}\";s:10:\"cloudfront\";s:28:\"#{node['aws']['cloudfront_full_domain']}\";s:10:\"wp-uploads\";s:1:\"1\";}"
 tantan_query = "INSERT INTO wp_options (option_name,option_value,autoload) VALUES ('tantan_wordpress_s3','#{tantan_wordpress_s3_json}}','yes') ON DUPLICATE KEY UPDATE option_name='tantan_wordpress_s3', option_value='#{tantan_wordpress_s3_json}}';"
 
 db_credentials = { host: dbs.first['fqdn'],

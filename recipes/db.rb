@@ -118,13 +118,13 @@ node.override['newrelic']['server_monitoring']['license'] = bag[:newrelic]['key'
 
 node.default['newrelic']['application_monitoring']['enabled'] = false
 
-node.default[:newrelic][:mysql][:servers] = [ { "name"          => "#{node.default[:yams][:human_name]}",
-                                                "host"          => "127.0.0.1",
-                                                "metrics"       => "status,newrelic,master",
-                                                "mysql_user"    => "root",
-                                                "mysql_passwd"  => bag[:mysql]['root_password']
-                                              }
-                                            ]
+node.default['newrelic']['mysql']['servers'] = [ { "name"       => node['yams']['human_name'],
+                                                   "host"          => "127.0.0.1",
+                                                   "metrics"       => "status,newrelic,master",
+                                                   "mysql_user"    => "root",
+                                                   "mysql_passwd"  => bag[:mysql]['root_password']
+                                                 }
+                                               ]
 
 include_recipe 'java'
 include_recipe 'python'

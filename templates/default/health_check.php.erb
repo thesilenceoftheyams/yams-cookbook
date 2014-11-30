@@ -3,14 +3,14 @@
 
 $message = '';
 
-$link = mysql_connect('<%= node[:wordpress][:db][:host] %>',
-                      '<%= node[:wordpress][:db][:user] %>',
-                      '<%= node[:wordpress][:db][:pass] %>');
+$link = mysql_connect('<%= node['wordpress']['db']['host'] %>',
+                      '<%= node['wordpress']['db']['user'] %>',
+                      '<%= node['wordpress']['db']['pass'] %>');
 
 if ( ! $link ) {
   $message = mysql_error();
 } else {
-  $db = mysql_select_db('<%= node[:wordpress][:db][:name] %>', $link);
+  $db = mysql_select_db('<%= node['wordpress']['db']['name'] %>', $link);
   if(!$db) {
     $message = 'Could not select database.';
   }

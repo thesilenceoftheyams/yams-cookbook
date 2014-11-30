@@ -305,9 +305,9 @@ return array(
 	'cdn.cf.cname' => array(
 	),
 	'cdn.cf.ssl' => 'auto',
-	'cdn.cf2.key' => '<%= node[:aws][:cloudfront_key] %>',
-	'cdn.cf2.secret' => '<%= node[:aws][:cloudfront_secret] %>',
-	'cdn.cf2.id' => '<%= node[:aws][:cloudfront_subdomain] %>',
+	'cdn.cf2.key' => '<%= node['aws']['cloudfront_key'] %>',
+	'cdn.cf2.secret' => '<%= node['aws']['cloudfront_secret'] %>',
+	'cdn.cf2.id' => '<%= node['aws']['cloudfront_subdomain'] %>',
 	'cdn.cf2.cname' => array(
 	0 => 'cdn1.thesilenceoftheyams.com',
 	1 => 'cdn2.thesilenceoftheyams.com',
@@ -661,10 +661,10 @@ return array(
 	'common.instance_id' => 1925258017,
 	'common.force_master' => true,
 	'newrelic.enabled' => true,
-	'newrelic.api_key' => '<%= node[:newrelic][:api_key] %>',
+	'newrelic.api_key' => '<%= node['newrelic']['api_key'] %>',
 	'newrelic.account_id' => '246147',
 	'newrelic.application_id' => 4664958,
-	'newrelic.appname' => '<%= node[:yams][:human_name] %>',
+	'newrelic.appname' => '<%= node['yams']['human_name'] %>',
 	'newrelic.accept.logged_roles' => true,
 	'newrelic.accept.roles' => array(
 	0 => 'contributor',

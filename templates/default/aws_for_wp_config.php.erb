@@ -2,13 +2,13 @@
 // rename this file to "config.php" to use the settings below, instead of settings saved in the database through the dashboard admin
 // this can be used to automatically configure the plugin in a WordPress MU environment, or if you have automated scripts to deploy WordPress installs
 $TanTanWordPressS3Config = array(
-  'key' => '<%= node[:aws][:cloudfront_key] %>', // AWS Access Key ID
-  'secret' => '<%= node[:aws][:cloudfront_secret] %>', // AWS Secret Key
-  'bucket' => '<%= node[:aws][:s3_bucket] %>', // S3 Bucket
+  'key' => '<%= node['aws']['cloudfront_key'] %>', // AWS Access Key ID
+  'secret' => '<%= node['aws']['cloudfront_secret'] %>', // AWS Secret Key
+  'bucket' => '<%= node['aws']['s3_bucket'] %>', // S3 Bucket
   'virtual-host' => false, // Bucket is configured for virtual hosting
   'wp-uploads' => true, // mirror all WordPress uploads into Amazon S3 bucket
   'permissions' => 'public', // set to "public" to have the plugin force all files in the specified bucket to "public" (sometimes third party upload utilities don't do this)
   'hideAmazonS3UploadTab' => false, // hide the Amazon S3 tab in the WordPress upload widget
   'expires' => 0, // set http expires header 10 years into the future
-  'cloudfront' => '<%= node[:aws][:cloudfront_subdomain] %>.cloudfront.net', //this can be your cloudfront DNS name (*.cloudfront.net) or a CNAME alias
+  'cloudfront' => '<%= node['aws']['cloudfront_subdomain'] %>.cloudfront.net', //this can be your cloudfront DNS name (*.cloudfront.net) or a CNAME alias
 );
